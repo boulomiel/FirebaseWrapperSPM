@@ -1,3 +1,4 @@
 # FirebaseWrapperSPM
 
-A description of this package.
+Here is an integration example :
+https://github.com/boulomiel/sdkwrappertest
