@@ -1,2 +1,3 @@
 # FirebaseWrapperSPM
-FirebaseWrapperSPM is a shortcut to Firebase boiler plate
+
+A description of this package.
