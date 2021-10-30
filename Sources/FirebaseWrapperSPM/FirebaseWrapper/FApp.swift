@@ -10,7 +10,7 @@ import Firebase
 
 public struct FirebaseWrapper{
     
-    static func configure(){
+    public static func configure(){
         FirebaseApp.configure()
     }
    
