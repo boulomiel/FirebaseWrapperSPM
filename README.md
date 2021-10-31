@@ -116,14 +116,288 @@ To get a local copy up and running follow these simple example steps.
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- USAGE EXAMPLES -->
-<!-- ## Usage
+## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+```sh
+import Foundation
+import FirebaseWrapperSPM
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+
+struct User : FirebaseCodable{
+    var age : Int
+    var name : String
+    var city : String
+    var food : String
+    var gender : String
+    var date : String
+    var pets : [Pet]?
+    //var lastUpdated : String?
+}
+```
+
+```sh
+import Foundation
+import FirebaseWrapperSPM
+
+struct Pet : FirebaseCodable{
+    var name : String
+}
+```
+
+
+```sh
+import Foundation
+import FirebaseWrapperSPM
+
+
+struct User : FirebaseCodable{
+    var age : Int
+    var name : String
+    var city : String
+    var food : String
+    var gender : String
+    var date : String
+    var pets : [Pet]?
+    //var lastUpdated : String?
+}
+```
+
+
+```sh
+import Foundation
+import UIKit
+import FirebaseWrapperSPM
+
+class ViewController : UIViewController{
+    let db = DBWrapper()
+    var dbRef : DatabaseReference!
+    let storageWrapper = StorageWrapper()
+    let firestoreWrapper = FiretoreWrapper()
+
+    let user  = User(age: 29, name: "Jhon ", city: "London", food: "Couscous", gender: "mal", date: "02/03/1993", pets: [Pet(name: "Bounton"), Pet(name: "Tagada"), Pet(name: "Telma")])
+    
+    override func viewDidLoad() {
+        dbRef = db.getRef().child("Users/friends/")
+    }
+    
+    
+ // Mark : -  DBWrapper integ 
+    
+        func dbWrapperTest(){
+
+//        db.observe(for: dbRef, eventType: .childAdded, valueType: User.self) {[weak self] result in
+//            switch result{
+//            case .failure(let error):
+//                print(error)
+//            case .success(let decodable):
+//                print("OBSERVE", decodable.self)
+//                self?.dataSource.append(decodable)
+//                DispatchQueue.main.async {
+//                    self?.tableView?.reloadData()
+//                }
+//            }
+//        }
+        
+        db.getData(for: dbRef, decode: User.self) {[weak self] result  in
+            switch result{
+            case .failure(let error):
+                print(error)
+            case .success(let decodable):
+                print("getData", decodable.self)
+                self?.dataSource = decodable
+                DispatchQueue.main.async {
+                    self?.tableView?.reloadData()
+                }
+            }
+        }
+        
+
+        db.getData(for: dbRef){result in
+            switch result{
+            case .failure(let error):
+                print(error)
+            case .success(let data):
+                print("GETDATA", data)
+
+            }
+        }
+
+
+
+        db.getData(for: "name", in: refJon) { result in
+            switch result {
+            case .failure(let error):
+            print(error)
+            case .success(let data):
+            print("GETDATA FOR VALUE", data)
+            }
+        }
+        
+        db.getDataOnceForEvent(event: .childAdded) { result in
+            switch result{
+            case .failure(let error):
+            print(error)
+            case .success(let data):
+            print("GET DATA ONCE FOR EVENT CHILD ADDED",data)
+            }
+        }
+        
+        db.getDataOnceForEvent(for: dbRef, event: .childAdded,decode: User.self) { result in
+            switch result{
+            case .failure(let error):
+            print(error)
+            case .success(let data):
+            print("GET DATA ONCE FOR EVENT CHILD CHANGED - decodable ",data)
+            }
+        }
+        
+        db.updateChildrenValues(in: refJon, paths: "name", "food", values: "ruben","merguez")
+        
+        user.name = "Yael"
+        writeToDb()
+        
+    }
+    
+    
+   func writeToDb(){
+        let date =  Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd/MM/YYYY"
+        let strDate = dateFormatter.string(from: date)
+
+        db.write(at: "Users/friends/\(user.name)", value: user.toDict())
+    }
+    
+    
+   // Mark - : FirestoreWrapper integ
+   
+       func addDocument(){
+        firestoreWrapper.addData(collectionName: "Users", data: user) { result in
+            switch result{
+            case .success(let documentId):
+                print("ADD DOCUMENT" , documentId)
+            case .failure(let error):
+                print("ADD DOCUMENT", error.localizedDescription)
+            }
+        }
+    }
+    
+    func addDocumentWithId(){
+        firestoreWrapper.addDocumentWitId(collectionName: "Users", data: user, documentId: "Weirdo")
+    }
+    
+    
+    func updateData(){
+        firestoreWrapper.updateData(for: "Weirdo", in: "Users", data: ["age":120]) { result in
+            switch result{
+            case .success(let documentId):
+                print("UPDATE DATA" , "\(documentId) successfully updated")
+            case .failure(let error):
+                print("UPDATE DATA", error.localizedDescription)
+            }
+        }
+    }
+    
+    func retrieveDataOnce(){
+        firestoreWrapper.retrieveOnce(from: "Users", where: "Weirdo", decode: User.self) { result in
+            switch result{
+            case .success(let value):
+                print("RETRIEVE DATA ONCE" , value)
+            case .failure(let error):
+                print("RETRIEVE DATA ONCE", error.localizedDescription)
+            }
+        }
+    }
+    
+    func retrieveMultiple(){
+        let query = firestoreWrapper.getQueryEqualTo(in: "Users", for: "city", value: "London")
+        firestoreWrapper.retrieveMultipleOnce(from: query, decode: User.self) { [weak self]result in
+            switch result{
+            case .success(let values):
+                print("RETRIEVE MULTIPLE ONCE", values)
+                self?.dataSource = values
+                DispatchQueue.main.async {
+                    self?.tableView?.reloadData()
+                }
+            case .failure(let error):
+                print("RETRIEVE MULTIPLE ONCE ", error.localizedDescription)
+            }
+        }
+    }
+    
+    func retrieveAll(){
+        firestoreWrapper.retrieveAllOnce(from: "Users", decode: User.self) { result in
+            switch result{
+            case .success(let values):
+                values.forEach { user in
+                    print("PETS RETRIEVED FROM ALL" , user?.pets ?? "NO PETS" )
+                }
+            case .failure(let error):
+                print("RETRIEVE MULTIPLE", error.localizedDescription)
+            }
+        }
+    }
+    
+    
+    
+    // Mark - StorageWrapper integ :
+    
+    func uploadFileLocal(){
+        let storageRef = storageWrapper.getReference(for: "images/pikachu.jpeg", from: false)
+        if let ref = storageRef,
+           let localURL = URL.localURLForXCAsset(name: "pikachu", withExtension: "jpg") {
+            storageWrapper.uploadFile(from: localURL, in: ref) { result in
+                switch result{
+                case .success(let successUrl):
+                    print("upload file local", "SUCCESS -  \(successUrl?.absoluteString ?? "")")
+                case .failure(let error):
+                    print("upload file local", "FAILURE -  \(error)")
+                }
+            }
+        }
+        
+
+    }
+    
+    
+    func uploadFileFromData(){
+        if let image =  UIImage(named: "pikachu"),
+           let dataImage =  image.pngData(),
+           let storageRef = storageWrapper.getReference(for: "images/pikachu2.png", from: false){
+            storageWrapper.uploadFile(from: dataImage, in: storageRef){result in
+                switch result{
+                case .success(let successUrl):
+                    print("upload file data", "SUCCESS -  \(successUrl?.absoluteString ?? "")")
+                case .failure(let error):
+                    print("upload file data", "FAILURE -  \(error)")
+                }
+            }
+        }
+        storageWrapper.addUploadingObserver(taskStatus: .success)
+            
+    }
+    
+        func downloadFile(fromPath : String){
+        if let ref =  storageWrapper.getReference(for: fromPath, from: false){
+            storageWrapper.getDownloadURL(from: ref) {[weak self] resul in
+                switch resul{
+                case .success(let url):
+                    print("Download file", "URL : \(url)")
+                    self?.downloadFileWithUrl(urlString: url.absoluteString)
+                case .failure(let error):
+                    print("Download file", error)
+
+                }
+            }
+        }
+        
+    }
+    
+    
+```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
- -->
+
 
 
 <!-- ROADMAP -->
