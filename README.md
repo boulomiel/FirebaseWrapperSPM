@@ -112,7 +112,25 @@ To get a local copy up and running follow these simple example steps.
    ```
 6. Select the the update version 1.0.1 or higher or the "main" branch. 
 7. Wait until installation is finished
+8. Init the wrapper in the AppDelegate file :
 
+```sh
+import UIKit
+import Firebase
+import FirebaseWrapperSPM
+
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
+   
+    var coordinator: MainCoordinator?
+    var window: UIWindow?
+
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        FirebaseWrapper.configure()
+        return true
+    }
+```
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- USAGE EXAMPLES -->
