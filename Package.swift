@@ -29,6 +29,7 @@ let package = Package(
         .target(
             name: "FirebaseWrapperSPM",
             dependencies: [
+                    .product(name: "FirebaseAuth", package: "Firebase"),
                     .product(name: "FirebaseDatabase", package: "Firebase"),
                     .product(name: "FirebaseFirestore", package: "Firebase"),
                     .product(name: "FirebaseStorage", package: "Firebase"),
