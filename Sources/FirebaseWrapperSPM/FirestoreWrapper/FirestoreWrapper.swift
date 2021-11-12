@@ -100,9 +100,7 @@ public class FiretoreWrapper  : MainWrapper {
     ///  - Parameter completion : return nor error or an the id of the document lately added
     public func updateData(for documentId : String, in collection : String, data : [String : Any],  completion : @escaping( (Result<String, FireWrapperError>) -> Void)){
         let ref = db.collection(collection).document(documentId)
-        var updateData = data
-        updateData["lastUpdated"] = FieldValue.serverTimestamp()
-        
+        var updateData = data        
         ref.updateData(updateData) { err in
             if let err = err {
                 completion(.failure(FireWrapperError(title: "FireStoreError", message: err.localizedDescription)))
