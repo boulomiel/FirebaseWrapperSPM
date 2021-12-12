@@ -543,19 +543,28 @@ public class FirestoreWrapper  : MainWrapper {
         }
     }
     
-    
     /// Remove each and every stored listeners. this function is called when FirestoreWrapper is removed from memory.
     public func removeAllListener(){
         listeners.removeAll()
     }
     
-    
     deinit{
         removeAllListener()
     }
-    
+}
 
+extension CollectionReference{
     
+    func getDocuments<T : FirebaseCodable>(_ decode : T.Type,completion : @escaping((Result<T, FireWrapperError>) -> Void)){
+        if let err = err {
+            completion(.failure(.init(title: "FireStoreError", message: err.localizedDescription)))
+        } else {
+            if let documents =  querySnapshot?.documents{
+                let results = documents.map {self.generateType(with: $0.data() , as: T.self)}
+                completion(.success(results))
+            }
+        }
+    }
 }
 
 
