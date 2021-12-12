@@ -222,6 +222,20 @@ public class FirestoreWrapper  : MainWrapper {
         }
     }
     
+    
+    func retrieveDocumentFromRef<T : FirebaseCodable>(_ decode : T.Type,dbRef : CollectionReference,completion : @escaping((Result<[T?], FireWrapperError>) -> Void)){
+        dbRef.getDocuments() { (querySnapshot, err) in
+               if let err = err {
+                   completion(.failure(.init(title: "FireStoreError", message: err.localizedDescription)))
+               } else {
+                   if let documents =  querySnapshot?.documents{
+                       let results = documents.map {self.generateType(with: $0.data() , as: T.self)}
+                       completion(.success(results))
+               }
+           }
+       }
+    }
+    
     /// Retrieves the updated data from a collection as a Dictionnary<String,Any> for a specified document id, it doesn't listen to changes. If called offline the data retrieved can be the latest cached one or will fail.
     ///  - Parameter collectionName : The collection documents to compare are store at.
     ///  - Parameter documentId : The document id inside the collection.
@@ -550,20 +564,6 @@ public class FirestoreWrapper  : MainWrapper {
     
     deinit{
         removeAllListener()
-    }
-}
-
-extension CollectionReference{
-    
-    func getDocuments<T : FirebaseCodable>(_ decode : T.Type,completion : @escaping((Result<T, FireWrapperError>) -> Void)){
-        if let err = err {
-            completion(.failure(.init(title: "FireStoreError", message: err.localizedDescription)))
-        } else {
-            if let documents =  querySnapshot?.documents{
-                let results = documents.map {self.generateType(with: $0.data() , as: T.self)}
-                completion(.success(results))
-            }
-        }
     }
 }
 
