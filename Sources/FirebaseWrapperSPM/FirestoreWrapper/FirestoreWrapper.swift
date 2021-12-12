@@ -223,7 +223,7 @@ public class FirestoreWrapper  : MainWrapper {
     }
     
     
-    func retrieveDocumentFromRef<T : FirebaseCodable>(_ decode : T.Type,dbRef : CollectionReference,completion : @escaping((Result<[T?], FireWrapperError>) -> Void)){
+    public func retrieveDocumentFromRef<T : FirebaseCodable>(_ decode : T.Type,dbRef : CollectionReference,completion : @escaping((Result<[T?], FireWrapperError>) -> Void)){
         dbRef.getDocuments() { (querySnapshot, err) in
                if let err = err {
                    completion(.failure(.init(title: "FireStoreError", message: err.localizedDescription)))
