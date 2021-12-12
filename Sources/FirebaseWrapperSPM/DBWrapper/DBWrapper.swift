@@ -61,7 +61,7 @@ public class DBWrapper : MainWrapper{
 //        
 //    }
         
-    var ref : DatabaseReference {
+    public var ref : DatabaseReference {
         get{Database.database().reference()}
     }
     

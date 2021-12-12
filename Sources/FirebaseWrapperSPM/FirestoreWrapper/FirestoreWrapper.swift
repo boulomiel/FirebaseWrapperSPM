@@ -12,7 +12,7 @@ import FirebaseFirestoreUI
 
 public class FiretoreWrapper  : MainWrapper {
     
-    let db = Firestore.firestore()
+    public let db = Firestore.firestore()
     var listeners = [String:ListenerRegistration]()
     
     ///Returns a Query of specified documents equal to a value from a collection.
