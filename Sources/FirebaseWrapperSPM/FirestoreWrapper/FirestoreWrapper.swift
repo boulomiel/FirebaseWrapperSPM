@@ -10,7 +10,7 @@ import FirebaseFirestore
 import FirebaseFirestoreUI
 
 
-public class FiretoreWrapper  : MainWrapper {
+public class FirestoreWrapper  : MainWrapper {
     
     public let db = Firestore.firestore()
     var listeners = [String:ListenerRegistration]()
