@@ -286,12 +286,34 @@ public class FirestoreWrapper  : MainWrapper {
     }
     
     
+    /// Retrieves  a unique object according to a specified Query ( getQueryEqualTo , getQueryGreaterThanOrEqual etc... ) as FirebaseCodable (inherits from Codable)
+    ///  - Parameter query : The query to filter the result of the data retrieving.
+    ///  - Parameter to : The type to be inferred.
+    ///  - Parameter completion : Returns the infered value or a FireWrapperError
+    public func retrieveUniqueWithQuery<T : FirebaseCodable>(from query : Query, decode to : T.Type  ,completion : @escaping( (Result<T?, FireWrapperError>) -> Void)){
+         query
+            .getDocuments() {[weak self] (querySnapshot, err) in
+                if let err = err {
+                    completion(.failure(.init(title: "FireStoreError", message: err.localizedDescription)))
+                } else {
+                    if let documents =  querySnapshot?.documents{
+                        
+                        if let results = documents.map({self?.generateType(with: $0.data() , as: T.self)}).first{
+                            completion(.success(results))
+                        }else{
+                            completion(.failure(.init(title: "FireStoreError", message: "Document doesnt exit with \(query.description)")))
+                        }
+                }
+            }
+        }
+    }
+    
     
     /// Retrieves  all the data from a collection according to a specified Query ( getQueryEqualTo , getQueryGreaterThanOrEqual etc... ) as FirebaseCodable (inherits from Codable)
     ///  - Parameter query : The query to filter the result of the data retrieving.
     ///  - Parameter to : The type to be inferred.
     ///  - Parameter completion : Returns the infered value or a FireWrapperError
-    public func retrieveMultipleOnce<T : FirebaseCodable>(from query : Query, decode to : T.Type  ,completion : @escaping( (Result<[T?], FireWrapperError>) -> Void)){
+    public func retrieveMultipleWithQuery<T : FirebaseCodable>(from query : Query, decode to : T.Type  ,completion : @escaping( (Result<[T?], FireWrapperError>) -> Void)){
          query
             .getDocuments() {[weak self] (querySnapshot, err) in
                 if let err = err {
@@ -306,10 +328,31 @@ public class FirestoreWrapper  : MainWrapper {
     }
     
     
+    /// Retrieves a unique element according to a specified Query ( getQueryEqualTo , getQueryGreaterThanOrEqual etc... ) as  a  Dictionnary<String,Any>.
+    ///  - Parameter query : The query to filter the result of the data retrieving.
+    ///  - Parameter completion : Returns the infered value or a FireWrapperError
+    public func retrieveUniqueWithQuery(from query : Query ,completion : @escaping( (Result<[String:Any], FireWrapperError>) -> Void)){
+         query
+            .getDocuments() {(querySnapshot, err) in
+                if let err = err {
+                    completion(.failure(.init(title: "FireStoreError", message: err.localizedDescription)))
+                } else {
+                    if let documents =  querySnapshot?.documents{
+                        if let result = documents.map({$0.data()}).first{
+                            completion(.success(result))
+                        }else{
+                            completion(.failure(.init(title: "FireStoreError", message: "Document doesnt exit with \(query.description)")))
+                        }
+                }
+            }
+        }
+    }
+    
+    
     /// Retrieves  all the data from a collection according to a specified Query ( getQueryEqualTo , getQueryGreaterThanOrEqual etc... ) as an Array of Dictionnary<String,Any>.
     ///  - Parameter query : The query to filter the result of the data retrieving.
     ///  - Parameter completion : Returns the infered value or a FireWrapperError
-    public func retrieveMultipleOnce(from query : Query ,completion : @escaping( (Result<[[String:Any]], FireWrapperError>) -> Void)){
+    public func retrieveMultipleWithQuery(from query : Query ,completion : @escaping( (Result<[[String:Any]], FireWrapperError>) -> Void)){
          query
             .getDocuments() {(querySnapshot, err) in
                 if let err = err {
