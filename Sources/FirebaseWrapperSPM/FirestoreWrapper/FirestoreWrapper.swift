@@ -348,7 +348,6 @@ public class FirestoreWrapper  : MainWrapper {
         }
     }
     
-    
     /// Retrieves  all the data from a collection according to a specified Query ( getQueryEqualTo , getQueryGreaterThanOrEqual etc... ) as an Array of Dictionnary<String,Any>.
     ///  - Parameter query : The query to filter the result of the data retrieving.
     ///  - Parameter completion : Returns the infered value or a FireWrapperError
@@ -365,7 +364,6 @@ public class FirestoreWrapper  : MainWrapper {
             }
         }
     }
-    
     
     /// Retrieves  all the data from a collection as a FirebaseCodable (inherits from Codable)
     ///  - Parameter collectionName : The collection documents to compare are store at.

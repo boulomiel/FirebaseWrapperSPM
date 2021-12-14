@@ -194,6 +194,31 @@ public class StorageWrapper : MainWrapper {
         }
     }
     
+    /// Returns the download url of a storage reference
+    ///  - Parameter ref : the storage reference pointing tho the desired file to pull the download urls from
+    ///  - Parameter completion : If succeeds returns the url of the sotrage reference, otherwise return a FireWrapperError
+    public func getDownloadURLs(from ref : StorageReference, completion : @escaping((Result<[URL], FireWrapperError>) -> Void)){
+        ref.listAll { result, error  in
+            if let error = error{
+                completion(.failure(.init(title: "Storage", message: "Error : \(error) \n Could not find url for ref path : \n \(ref.fullPath)")))
+                return
+            }
+            
+            var urls = [URL]()
+            result.items.forEach{[weak self]item in
+                self?.getDownloadURL(from: item) { result in
+                    switch result {
+                    case .failure(let error) :
+                        print("getDownloadUrls", "url receiving failed \(error.localizedDescription)")
+                    case .success(let url):
+                        urls.append(url)
+                    }
+                }
+            }
+            completion(.success(urls))
+        }
+    }
+    
 
     
     // Download a file from a StorageReference to a Download folder inside the Cache Directory (Caches/Download/file)
